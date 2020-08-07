@@ -4,6 +4,9 @@ const logger = require("morgan");
 
 
 
+const Workout = require("./models/workouts");
+const Cardio = require("./models/cardio");
+const Resistance = require("./models/resistance");
 const PORT = process.env.PORT || 8080;
 const app = express();
 
@@ -23,17 +26,76 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/fitness-tracker
 
 
 app.get("/",function(req,res){
-    res.sendFile("./index.html");
+    res.sendfile("./index.html");
 })
 
 app.get("/stats",function(req,res){
-    res.sendFile("./public/stats.html");
+    res.sendfile("./public/stats.html");
 })
 
 app.get("/exercise",function(req,res){
-    res.sendFile("./public/exercise.html");
+    res.sendfile("./public/exercise.html");
 })
 
+
+app.post("/api/workouts",function(req,res){
+    console.log("post hit")
+    console.log(req.body);
+    Workout.create({
+        totalWorkoutDuration:0,
+        exercisesPerformed:0,
+        weight:0,
+        sets:0,
+        reps:0,
+        distance:0
+    })
+    .then(dbWorkout => {
+        res.json(dbWorkout);
+    })
+    .catch(({ message }) => {
+        console.log(message);
+        res.json(message);
+    });
+    
+})
+
+app.put("/api/workouts/:id",function (req,res){
+    console.log("put hit!");
+    var exercise = req.body;
+    if(req.body.type === "cardio"){
+        Cardio.create({
+            name: req.body.name,
+            distance: req.body.distance,
+            duration: req.body.duration
+        }).then(dbCardio => {
+            res.json(dbCardio);
+        }).catch(err => {
+            res.json(err);
+        });
+    }
+    if(req.body.type === "resistance"){
+        Resistance.create({
+            name: req.body.name,
+            weight: req.body.weight,
+            duration: req.body.duration,
+            sets: req.body.sets,
+            reps: req.body.reps
+        }).then(dbResistance => {
+            res.json(dbResistance);
+        }).catch(err => {
+            res.json(dbResistance);
+        });
+    }
+    console.log(exercise);
+    console.log(id);
+    // var currentWorkout = Workout.findById({_id: req.params.id});
+    // console.log(currentWorkout);
+    var id = req.params.id;
+    // Workout.findByIdAndUpdate(
+    //     {_id:id},
+    //     {}
+    //     )
+})
 
 app.listen(PORT, function() {
     console.log("App listening on PORT " + "http://localhost:" + PORT);
