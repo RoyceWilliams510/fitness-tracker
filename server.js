@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const logger = require("morgan");
 
 
-
+const Exercise = require("./models/exerciseModel");
 const Workout = require("./models/workouts");
 const Cardio = require("./models/cardio");
 const Resistance = require("./models/resistance");
@@ -41,14 +41,7 @@ app.get("/exercise",function(req,res){
 app.post("/api/workouts",function(req,res){
     console.log("post hit")
     console.log(req.body);
-    Workout.create({
-        totalWorkoutDuration:0,
-        exercisesPerformed:0,
-        weight:0,
-        sets:0,
-        reps:0,
-        distance:0
-    })
+    Workout.create({})
     .then(dbWorkout => {
         res.json(dbWorkout);
     })
@@ -60,13 +53,17 @@ app.post("/api/workouts",function(req,res){
 })
 
 app.put("/api/workouts/:id",function (req,res){
+    var id = req.params.id;
     console.log("put hit!");
+    console.log(id);
     var exercise = req.body;
     if(req.body.type === "cardio"){
-        Cardio.create({
+        Exercise.create({
             name: req.body.name,
+            type: req.body.type,
             distance: req.body.distance,
-            duration: req.body.duration
+            duration: req.body.duration,
+            workout: id
         }).then(dbCardio => {
             res.json(dbCardio);
         }).catch(err => {
@@ -74,23 +71,23 @@ app.put("/api/workouts/:id",function (req,res){
         });
     }
     if(req.body.type === "resistance"){
-        Resistance.create({
+        Exercise.create({
             name: req.body.name,
+            type: req.body.type,
             weight: req.body.weight,
             duration: req.body.duration,
             sets: req.body.sets,
-            reps: req.body.reps
+            reps: req.body.reps,
+            workout: id
         }).then(dbResistance => {
             res.json(dbResistance);
         }).catch(err => {
             res.json(dbResistance);
         });
     }
-    console.log(exercise);
-    console.log(id);
+    
     // var currentWorkout = Workout.findById({_id: req.params.id});
     // console.log(currentWorkout);
-    var id = req.params.id;
     // Workout.findByIdAndUpdate(
     //     {_id:id},
     //     {}
