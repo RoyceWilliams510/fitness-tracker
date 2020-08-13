@@ -66,6 +66,11 @@ app.put("/api/workouts/:id",function (req,res){
             workout: id
         }).then(dbCardio => {
             res.json(dbCardio);
+            console.log(dbCardio);
+            Workout.findById(id, (err,workout)=>{
+                workout.exercises.push(dbCardio);
+                workout.save();
+            })
         }).catch(err => {
             res.json(err);
         });
@@ -81,6 +86,10 @@ app.put("/api/workouts/:id",function (req,res){
             workout: id
         }).then(dbResistance => {
             res.json(dbResistance);
+            Workout.findById(id, (err,workout)=>{
+                workout.exercises.push(dbResistance);
+                workout.save();
+            })
         }).catch(err => {
             res.json(dbResistance);
         });
